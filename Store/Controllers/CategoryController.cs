@@ -16,10 +16,17 @@ namespace Store.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAll([FromQuery] CategoryFilterDto? filter = null)
         {
-            var categories = await _categoryService.GetAll();
-            return Ok(categories);
+            try
+            {
+                var categories = await _categoryService.GetAllAsync(filter);
+                return Ok(categories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener categorías: {ex.Message}");
+            }
         }
 
         [HttpGet("{id}")]
