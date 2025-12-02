@@ -6,7 +6,7 @@ namespace DataAccess.Repositories.BaseRepository
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
-        private readonly ApplicationDbContext _context;
+        protected readonly ApplicationDbContext _context;
 
         public BaseRepository(ApplicationDbContext context)
         {
@@ -16,6 +16,7 @@ namespace DataAccess.Repositories.BaseRepository
         public virtual void Delete(T entity)
         {
             _context.Set<T>().Remove(entity);
+            _context.SaveChanges();
         }
 
         public virtual async Task<T?> Get(int id) => await _context.Set<T>().FindAsync(id);
@@ -27,12 +28,14 @@ namespace DataAccess.Repositories.BaseRepository
         public virtual async Task<int> Insert(T entity)
         {
             _context.Add(entity);
-            return Convert.ToInt32(_context.SaveChanges());
+            await _context.SaveChangesAsync();
+            return entity.GetType().GetProperty("Id")?.GetValue(entity) as int? ?? 0;
         }
 
         public virtual void Update(T entity)
         {
             _context.Set<T>().Update(entity);
+            _context.SaveChanges();
         }
     }
 }

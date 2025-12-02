@@ -9,7 +9,7 @@ namespace DataAccess.Repositories.BaseRepository
     public interface IBaseRepository<T>
     {
         Task<IEnumerable<T>> GetAll();
-        Task<T> Get(int id);
+        Task<T?> Get(int id);
         Task<int> Insert(T entity);
         void Update(T entity);
         void Delete(T entity);

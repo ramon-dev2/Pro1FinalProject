@@ -1,4 +1,4 @@
-namespace Store.Entities
+namespace DataAccess.Entities
 {
     public class Category
     {

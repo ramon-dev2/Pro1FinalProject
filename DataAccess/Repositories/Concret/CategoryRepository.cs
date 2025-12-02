@@ -1,10 +1,11 @@
 ﻿using DataAccess.Context;
+using DataAccess.Repositories.Abstract;
 using DataAccess.Repositories.BaseRepository;
-using Store.Entities;
+using DataAccess.Entities;
 
 namespace DataAccess.Repositories.Concret
 {
-    public class CategoryRepository : BaseRepository<Category>
+    public class CategoryRepository : BaseRepository<Category>, ICategoryRepository
     {
         public CategoryRepository(ApplicationDbContext context) : base(context)
         {

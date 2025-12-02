@@ -15,19 +15,44 @@ namespace BusinessLogic.Services.Concret
             _mapper = mapper;
         }
 
-        public void Delete(TDto entity)
+        public virtual void Delete(TDto dto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var entity = _mapper.Map<M>(dto);
+                _baseRepository.Delete(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.Message);
+            }
         }
 
-        public Task<TDto> Get(int id)
+        public virtual async Task<TDto?> Get(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var entity = await _baseRepository.Get(id);
+                if (entity == null) return null;
+                return _mapper.Map<TDto>(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.Message);
+            }
         }
 
-        public Task<IEnumerable<TDto>> GetAll()
+        public virtual async Task<IEnumerable<TDto>> GetAll()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var entities = await _baseRepository.GetAll();
+                return _mapper.Map<IEnumerable<TDto>>(entities);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.Message);
+            }
         }
 
         public virtual async Task<int> Insert(TDto dto)
@@ -35,16 +60,31 @@ namespace BusinessLogic.Services.Concret
             try
             {
                 var entity = _mapper.Map<M>(dto);
+                // Asegurar que el Id sea 0 para nuevas entidades
+                var idProperty = entity.GetType().GetProperty("Id");
+                if (idProperty != null && idProperty.CanWrite)
+                {
+                    idProperty.SetValue(entity, 0);
+                }
                 return await _baseRepository.Insert(entity);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new ArgumentException(ex.Message);
             }
         }
 
-        public void Update(TDto entity)
+        public virtual void Update(TDto dto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var entity = _mapper.Map<M>(dto);
+                _baseRepository.Update(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.Message);
+            }
         }
     }
 }

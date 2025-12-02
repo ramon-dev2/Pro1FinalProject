@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogic.Dtos;
-using Store.Entities;
+using DataAccess.Entities;
 
 namespace BusinessLogic.Profiles
 {
@@ -9,6 +9,8 @@ namespace BusinessLogic.Profiles
         public CategoryProfile()
         {
             CreateMap<CategoryDto, Category>().ReverseMap();
+            CreateMap<CategoryCreateDto, Category>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
         }
     }
 }

@@ -1,10 +1,9 @@
-﻿using Store.Entities;
+﻿using DataAccess.Entities;
+using DataAccess.Repositories.BaseRepository;
 
 namespace DataAccess.Repositories.Abstract
 {
-    public interface ICategoryRepository
+    public interface ICategoryRepository : IBaseRepository<Category>
     {
-       IEnumerable<Category> GetAll();
-       Category Post(Category category);
     }
 }
