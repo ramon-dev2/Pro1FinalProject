@@ -41,46 +41,60 @@ namespace Store.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Mapear CreateDto a Dto para el servicio
-            var categoryDto = new CategoryDto
+            try
             {
-                Name = categoryCreateDto.Name
-            };
-
-            var id = await _categoryService.Insert(categoryDto);
-            categoryDto.Id = id;
-            return CreatedAtAction(nameof(Get), new { id = id }, categoryDto);
+                var categoryDto = await _categoryService.CreateAsync(categoryCreateDto);
+                return CreatedAtAction(nameof(Get), new { id = categoryDto.Id }, categoryDto);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al crear la categoría: {ex.Message}");
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] CategoryDto categoryDto)
         {
-            if (id != categoryDto.Id)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
-            var existingCategory = await _categoryService.Get(id);
-            if (existingCategory == null)
+            try
             {
-                return NotFound();
+                await _categoryService.UpdateAsync(id, categoryDto);
+                return NoContent();
             }
-
-            _categoryService.Update(categoryDto);
-            return NoContent();
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar la categoría: {ex.Message}");
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var category = await _categoryService.Get(id);
-            if (category == null)
+            try
             {
-                return NotFound();
+                var deleted = await _categoryService.DeleteAsync(id);
+                if (!deleted)
+                {
+                    return NotFound();
+                }
+                return NoContent();
             }
-
-            _categoryService.Delete(category);
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al eliminar la categoría: {ex.Message}");
+            }
         }
     }
 }
