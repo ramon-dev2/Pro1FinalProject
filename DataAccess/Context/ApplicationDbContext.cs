@@ -13,7 +13,7 @@ namespace DataAccess.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure Category
+
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -21,8 +21,7 @@ namespace DataAccess.Context
                 entity.Property(e => e.IsDeleted).HasDefaultValue(false);
                 entity.HasIndex(e => e.IsDeleted);
             });
-
-            // Configure Product
+            
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -36,8 +35,7 @@ namespace DataAccess.Context
                     .HasForeignKey(e => e.CategoryId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
-
-            // Configure Customer
+            
             modelBuilder.Entity<Customer>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -47,28 +45,25 @@ namespace DataAccess.Context
                 entity.Property(e => e.Phone).HasMaxLength(20);
                 entity.Property(e => e.Address).HasMaxLength(500);
                 entity.Property(e => e.IsDeleted).HasDefaultValue(false);
-                // Índice único compuesto: Email solo debe ser único si no está eliminado
                 entity.HasIndex(e => new { e.Email, e.IsDeleted })
                     .IsUnique()
                     .HasFilter("[IsDeleted] = 0");
                 entity.HasIndex(e => e.IsDeleted);
             });
-
-            // Configure Status
+            
             modelBuilder.Entity<Status>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.Description).HasMaxLength(200);
                 entity.Property(e => e.IsDeleted).HasDefaultValue(false);
-                // Índice único compuesto: Name solo debe ser único si no está eliminado
                 entity.HasIndex(e => new { e.Name, e.IsDeleted })
                     .IsUnique()
                     .HasFilter("[IsDeleted] = 0");
                 entity.HasIndex(e => e.IsDeleted);
             });
 
-            // Configure Order
+         
             modelBuilder.Entity<Order>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -85,7 +80,7 @@ namespace DataAccess.Context
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // Configure OrderItem
+  
             modelBuilder.Entity<OrderItem>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -101,7 +96,7 @@ namespace DataAccess.Context
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // Configure InventoryMovement
+            
             modelBuilder.Entity<InventoryMovement>(entity =>
             {
                 entity.HasKey(e => e.Id);

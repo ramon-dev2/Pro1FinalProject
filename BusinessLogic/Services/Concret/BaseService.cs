@@ -60,7 +60,6 @@ namespace BusinessLogic.Services.Concret
             try
             {
                 var entity = _mapper.Map<M>(dto);
-                // Asegurar que el Id sea 0 para nuevas entidades
                 var idProperty = entity.GetType().GetProperty("Id");
                 if (idProperty != null && idProperty.CanWrite)
                 {

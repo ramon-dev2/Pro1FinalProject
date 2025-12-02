@@ -51,8 +51,6 @@ namespace DataAccess.Repositories.BaseRepository
         public virtual async Task<T?> Find(Expression<Func<T, bool>> predicate)
         {
             var query = _context.Set<T>().AsNoTracking();
-            
-            // Filtrar registros eliminados si la entidad tiene IsDeleted
             var isDeletedProperty = typeof(T).GetProperty("IsDeleted");
             if (isDeletedProperty != null)
             {
@@ -64,13 +62,11 @@ namespace DataAccess.Repositories.BaseRepository
                 query = query.Where(notDeletedLambda);
             }
             
-            // Aplicar el predicado original
             return await query.FirstOrDefaultAsync(predicate);
         }
 
         public virtual async Task<IEnumerable<T>> GetAll()
         {
-            // Filtrar registros eliminados
             var query = _context.Set<T>().AsNoTracking();
             
             var isDeletedProperty = typeof(T).GetProperty("IsDeleted");
