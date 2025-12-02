@@ -32,6 +32,9 @@ namespace DataAccess.DependencyInjection
             
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IBaseRepository<Order>, OrderRepository>();
+            
+            services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
+            services.AddScoped<IBaseRepository<InventoryMovement>, InventoryMovementRepository>();
         }
     }
 }

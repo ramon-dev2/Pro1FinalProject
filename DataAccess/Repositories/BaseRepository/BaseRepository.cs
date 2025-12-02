@@ -15,15 +15,77 @@ namespace DataAccess.Repositories.BaseRepository
 
         public virtual void Delete(T entity)
         {
-            _context.Set<T>().Remove(entity);
+            var isDeletedProperty = entity.GetType().GetProperty("IsDeleted");
+            var deletedAtProperty = entity.GetType().GetProperty("DeletedAt");
+            
+            if (isDeletedProperty != null && isDeletedProperty.CanWrite)
+            {
+                isDeletedProperty.SetValue(entity, true);
+            }
+            
+            if (deletedAtProperty != null && deletedAtProperty.CanWrite)
+            {
+                deletedAtProperty.SetValue(entity, DateTime.UtcNow);
+            }
+            
+            _context.Set<T>().Update(entity);
             _context.SaveChanges();
         }
 
-        public virtual async Task<T?> Get(int id) => await _context.Set<T>().FindAsync(id);
+        public virtual async Task<T?> Get(int id)
+        {
+            var entity = await _context.Set<T>().FindAsync(id);
+            if (entity == null) return null;
+            
+            // Verificar si está eliminado lógicamente
+            var isDeletedProperty = entity.GetType().GetProperty("IsDeleted");
+            if (isDeletedProperty != null)
+            {
+                var isDeleted = isDeletedProperty.GetValue(entity) as bool?;
+                if (isDeleted == true) return null;
+            }
+            
+            return entity;
+        }
 
-        public virtual async Task<T?> Find(Expression<Func<T, bool>> predicate) => await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(predicate); 
+        public virtual async Task<T?> Find(Expression<Func<T, bool>> predicate)
+        {
+            var query = _context.Set<T>().AsNoTracking();
+            
+            // Filtrar registros eliminados si la entidad tiene IsDeleted
+            var isDeletedProperty = typeof(T).GetProperty("IsDeleted");
+            if (isDeletedProperty != null)
+            {
+                var parameter = Expression.Parameter(typeof(T), "x");
+                var property = Expression.Property(parameter, isDeletedProperty);
+                var falseConstant = Expression.Constant(false);
+                var notDeletedCondition = Expression.Equal(property, falseConstant);
+                var notDeletedLambda = Expression.Lambda<Func<T, bool>>(notDeletedCondition, parameter);
+                query = query.Where(notDeletedLambda);
+            }
+            
+            // Aplicar el predicado original
+            return await query.FirstOrDefaultAsync(predicate);
+        }
 
-        public virtual async Task<IEnumerable<T>> GetAll() => await _context.Set<T>().AsNoTracking().ToListAsync();
+        public virtual async Task<IEnumerable<T>> GetAll()
+        {
+            // Filtrar registros eliminados
+            var query = _context.Set<T>().AsNoTracking();
+            
+            var isDeletedProperty = typeof(T).GetProperty("IsDeleted");
+            if (isDeletedProperty != null)
+            {
+                var parameter = Expression.Parameter(typeof(T), "x");
+                var property = Expression.Property(parameter, isDeletedProperty);
+                var falseConstant = Expression.Constant(false);
+                var condition = Expression.Equal(property, falseConstant);
+                var lambda = Expression.Lambda<Func<T, bool>>(condition, parameter);
+                query = query.Where(lambda);
+            }
+            
+            return await query.ToListAsync();
+        }
 
         public virtual async Task<int> Insert(T entity)
         {

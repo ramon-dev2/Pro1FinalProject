@@ -14,7 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Configure AutoMapper
-builder.Services.AddAutoMapper(typeof(CategoryProfile), typeof(ProductProfile), typeof(CustomerProfile), typeof(StatusProfile), typeof(OrderProfile));
+builder.Services.AddAutoMapper(typeof(CategoryProfile), typeof(ProductProfile), typeof(CustomerProfile), typeof(StatusProfile), typeof(OrderProfile), typeof(InventoryMovementProfile));
 
 // Configure Repositories
 builder.Services.AddRepository(builder.Configuration);
